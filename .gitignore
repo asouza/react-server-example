@@ -1,3 +1,4 @@
+.mvn/
 .DS_Store
 *.class
 *.war
@@ -8,3 +9,4 @@ target/
 .classpath
 .project
 .settings/
+/bin/
