@@ -9,10 +9,9 @@ import java.util.Scanner;
 public class Browser {
 
 	public static void main(String[] args) throws UnknownHostException, IOException {
-		
-		try (Socket browser = new Socket("localhost", 8080)) {
-			handleServerReturn(browser);
-		}
+			try (Socket browser = new Socket("localhost", 8080)) {
+				handleServerReturn(browser);
+			}
 
 	}
 

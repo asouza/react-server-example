@@ -16,14 +16,16 @@ public class ReactorServer {
 	@SuppressWarnings("resource")
 	public static void main(String[] args) throws IOException {
 		ServerSocket server = new ServerSocket(8080);
-		Socket newClient = server.accept();
-		PrintStream response = new PrintStream(newClient.getOutputStream());
-		
-		threadRequestsPool.execute(() -> {
-			//Spring will decide which method should respond to the request
-				new ListAction().execute(response);				
-				closeResourcesAfterLogic(newClient, response);
-			});
+		while (true) {
+			Socket newClient = server.accept();
+			PrintStream response = new PrintStream(newClient.getOutputStream());
+
+			threadRequestsPool.execute(() -> {
+				// Spring will decide which method should respond to the request
+					new ListAction().execute(response);
+					closeResourcesAfterLogic(newClient, response);
+				});
+		}
 	}
 
 	private static void closeResourcesAfterLogic(Socket newClient, PrintStream response) {
