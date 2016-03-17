@@ -9,6 +9,7 @@ import java.util.Scanner;
 public class Browser {
 
 	public static void main(String[] args) throws UnknownHostException, IOException {
+		
 		try (Socket browser = new Socket("localhost", 8080)) {
 			handleServerReturn(browser);
 		}
@@ -18,8 +19,8 @@ public class Browser {
 	private static void handleServerReturn(Socket browser) throws IOException {
 		try (InputStream serverResponse = browser.getInputStream();
 				Scanner scanner = new Scanner(serverResponse)) {
-			while (scanner.hasNextLine()) {
-				System.out.println(scanner.nextLine());
+			while (scanner.hasNext()) {
+				System.out.println(scanner.next());
 			}
 		}
 	}
