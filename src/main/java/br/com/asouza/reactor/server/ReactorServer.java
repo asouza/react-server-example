@@ -10,7 +10,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import br.com.asouza.reactor.actions.Action;
-import br.com.asouza.reactor.actions.ListAction;
 
 public class ReactorServer {
 
@@ -22,22 +21,29 @@ public class ReactorServer {
 		while (true) {
 			Socket newClient = server.accept();
 			PrintStream response = new PrintStream(newClient.getOutputStream());
-			InputStream fromClient = newClient.getInputStream();
-			Scanner scanner = new Scanner(fromClient);
-			
-			Action action = (Action) Class.forName("br.com.asouza.reactor.actions."+scanner.next()).newInstance();			
-			
+			Action action = discoverAction(newClient);
+
 			threadRequestsPool.execute(() -> {
-				// Spring will decide which method should respond to the request
-					action.execute(response);
-					closeResourcesAfterLogic(newClient, response);
-				});
+				action.execute(response);
+				closeResourcesAfterLogic(newClient, response);
+			});
+		}
+	}
+
+	private static Action discoverAction(Socket newClient) throws IOException,
+			InstantiationException, IllegalAccessException, ClassNotFoundException {
+		InputStream fromClient = newClient.getInputStream();
+		try (Scanner scanner = new Scanner(fromClient)) {
+
+			Action action = (Action) Class.forName(
+					"br.com.asouza.reactor.actions." + scanner.next()).newInstance();
+			return action;
 		}
 	}
 
 	private static void closeResourcesAfterLogic(Socket newClient, PrintStream response) {
-		response.close();
 		try {
+			response.close();
 			newClient.close();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
