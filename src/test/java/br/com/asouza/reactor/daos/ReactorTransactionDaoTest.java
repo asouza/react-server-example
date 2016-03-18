@@ -34,7 +34,8 @@ public class ReactorTransactionDaoTest {
 		Flux<Transaction> transactions = transactionDao.list(100);
 		
 		Consumer<Transaction> onNextConsumer = (t) -> {
-			if(t.getValue().compareTo(new BigDecimal("9458.45")) == 0){
+			BigDecimal lastTransaction = new BigDecimal("9458.45");
+			if(t.getValue().compareTo(lastTransaction) == 0){
 				throw new RuntimeException("Throwing exception just to test");
 			}
 			System.out.println(t.getValue());			
