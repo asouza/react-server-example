@@ -4,8 +4,8 @@ import java.io.PrintStream;
 import java.sql.Connection;
 
 import reactor.core.publisher.Flux;
+import br.com.asouza.reactor.daos.CompleteReactiveTransactionDao;
 import br.com.asouza.reactor.daos.ConnectionFactory;
-import br.com.asouza.reactor.daos.TransactionDao;
 import br.com.asouza.reactor.infra.GlobalCounter;
 import br.com.asouza.reactor.models.Transaction;
 
@@ -22,7 +22,7 @@ public class ListAction implements Action {
 		System.out.println("list action("+index+") " + Thread.currentThread().getName());
 
 			Connection connection = ConnectionFactory.get();
-			Flux<Transaction> txs = new TransactionDao(connection).list(200000);
+			Flux<Transaction> txs = new CompleteReactiveTransactionDao(connection).list(200000);
 			
 			txs.doOnComplete(() -> {
 				try {

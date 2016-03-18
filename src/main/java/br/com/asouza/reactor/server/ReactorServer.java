@@ -30,6 +30,7 @@ public class ReactorServer {
 			Runnable runnable = () -> {
 				IndexedRunnable actionRunnable = action.execute(response);
 				actionRunnable.run();
+				
 				System.out.println("Closing resources "+actionRunnable.toString());
 				closeResourcesAfterLogic(newClient, response);
 			};

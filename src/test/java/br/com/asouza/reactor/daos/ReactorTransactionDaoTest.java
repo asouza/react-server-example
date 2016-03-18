@@ -21,7 +21,7 @@ public class ReactorTransactionDaoTest {
 	@Before
 	public void setup() {
 		connection = ConnectionFactory.get();
-		transactionDao = new TransactionDao(connection);
+		transactionDao = new CompleteReactiveTransactionDao(connection);
 	}
 
 	@After
