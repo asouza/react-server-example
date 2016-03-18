@@ -19,7 +19,7 @@ public class TransactionDao {
 
 	public List<Transaction> list() {
 		try {
-			PreparedStatement ps = connection.prepareStatement("select * from transacao limit 1000000");
+			PreparedStatement ps = connection.prepareStatement("select * from transacao limit 200000");
 			ResultSet resultSet = ps.executeQuery();
 			ArrayList<Transaction> txs = new ArrayList<Transaction>();
 			while(resultSet.next()){

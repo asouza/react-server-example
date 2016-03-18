@@ -10,8 +10,8 @@ import java.util.Scanner;
 public class Browser {
 
 	public static void main(String[] args) throws UnknownHostException, IOException {
-		for (int i = 1; i < 2; i++) {
-			if (i % 3 == 0) {
+		for (int i = 0; i < 50; i++) {
+			if (i > 32) {
 				newRequest(i, "JustInMemoryAction");
 			} else {
 				newRequest(i, "ListAction");
@@ -21,9 +21,12 @@ public class Browser {
 	}
 
 	private static void newRequest(int i, String action) {
-		try (Socket browser = new Socket("localhost", 8080);Scanner scanner = new Scanner(browser.getInputStream())) {
+		try{
+			Socket browser = new Socket("localhost", 8080);
 			notifyWhichAction(action, browser);
-			handleServerReturn(browser, i,scanner);
+			new Thread(() -> {
+				handleServerReturn(browser, i);					
+			}).start();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -36,10 +39,14 @@ public class Browser {
 		ps.flush();
 	}
 
-	private static void handleServerReturn(Socket browser, int clientId, Scanner scanner ) {
-			System.out.println("Client " + clientId + " " + System.nanoTime());
+	private static void handleServerReturn(Socket browser, int clientId) {
+		try(Scanner scanner = new Scanner(browser.getInputStream())) {
 			while (scanner.hasNextLine()) {
-				System.out.println(scanner.nextLine());			
+				System.out.println("Client " + clientId);
+				System.out.println(scanner.nextLine());
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 }

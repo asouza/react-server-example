@@ -33,17 +33,17 @@ public class ReactorServer {
 	private static Action discoverAction(Socket newClient) throws IOException,
 			InstantiationException, IllegalAccessException, ClassNotFoundException {
 		InputStream fromClient = newClient.getInputStream();
-		try (Scanner scanner = new Scanner(fromClient)) {
+		@SuppressWarnings("resource")
+		Scanner scanner = new Scanner(fromClient);
 
-			Action action = (Action) Class.forName(
-					"br.com.asouza.reactor.actions." + scanner.next()).newInstance();
-			return action;
-		}
+		Action action = (Action) Class.forName(
+				"br.com.asouza.reactor.actions." + scanner.next()).newInstance();
+		return action;
 	}
 
 	private static void closeResourcesAfterLogic(Socket newClient, PrintStream response) {
+		response.close();
 		try {
-			response.close();
 			newClient.close();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
