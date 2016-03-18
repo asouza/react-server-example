@@ -33,7 +33,7 @@ public class ListAction implements Action {
 			});
 			//here we need to think about how to build the html in a reactive way
 			return new IndexedRunnable(index,() -> {
-				System.out.println("gerando a resposta para "+index);
+				System.out.println("generating response from action "+index);
 				response.println("<html><body>"+txs.count().get()+"</body></html>");
 			});
 
