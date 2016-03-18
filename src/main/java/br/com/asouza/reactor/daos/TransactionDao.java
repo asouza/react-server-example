@@ -17,9 +17,10 @@ public class TransactionDao {
 		this.connection = connection;
 	}
 
-	public List<Transaction> list() {
+	public List<Transaction> list(int count) {
 		try {
-			PreparedStatement ps = connection.prepareStatement("select * from transacao limit 200000");
+			PreparedStatement ps = connection.prepareStatement("select * from transacao limit ?");
+			ps.setInt(1, count);
 			ResultSet resultSet = ps.executeQuery();
 			ArrayList<Transaction> txs = new ArrayList<Transaction>();
 			while(resultSet.next()){

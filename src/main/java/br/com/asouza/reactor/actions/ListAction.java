@@ -22,8 +22,7 @@ public class ListAction implements Action {
 
 		StringBuilder html = new StringBuilder("<html><body>");
 		try (Connection connection = ConnectionFactory.get()) {
-			List<Transaction> txs = new TransactionDao(connection).list();
-			System.out.println(txs.size()+"====");
+			List<Transaction> txs = new TransactionDao(connection).list(200000);
 			response.println(html.append(txs.size()).append("</body></html>"));			
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
