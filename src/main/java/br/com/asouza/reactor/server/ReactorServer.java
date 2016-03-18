@@ -31,7 +31,7 @@ public class ReactorServer {
 				IndexedRunnable actionRunnable = action.execute(response);
 				actionRunnable.run();
 				
-				System.out.println("Closing resources "+actionRunnable.toString());
+				System.out.println("Closing resources "+actionRunnable);
 				closeResourcesAfterLogic(newClient, response);
 			};
 			if (action.hasDatabaseCalls()) {
