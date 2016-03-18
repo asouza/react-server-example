@@ -5,6 +5,6 @@ import java.util.function.Supplier;
 
 public interface Action {
 
-	public abstract Supplier<String> execute(PrintStream response);
+	public abstract Runnable execute(PrintStream response);
 
 }
