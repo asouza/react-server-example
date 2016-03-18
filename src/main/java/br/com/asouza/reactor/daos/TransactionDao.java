@@ -3,9 +3,9 @@ package br.com.asouza.reactor.daos;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import br.com.asouza.reactor.models.Transaction;
 import br.com.asouza.reactor.transformers.TransactionTransformer;
 
@@ -18,14 +18,16 @@ public class TransactionDao {
 	}
 
 	public Flux<Transaction> list(int count) {
-		try {
+		//#nonblocking
+		Mono<ResultSet> resultSet = Mono.fromCallable(() -> {
 			PreparedStatement ps = connection.prepareStatement("select * from transacao limit ?");
 			ps.setInt(1, count);
-			ResultSet resultSet = ps.executeQuery();
-			return Flux.fromIterable(new ResultSetIterator<Transaction>(resultSet,new TransactionTransformer()));
-		} catch (SQLException e) {
-			throw new RuntimeException(e);
-		}
+			return ps.executeQuery();
+		});
+
+		//#nonblocking
+		return resultSet.flatMap(rs -> Flux.fromIterable(new ResultSetIterator<Transaction>(rs,
+				new TransactionTransformer())));
 	}
 
 }

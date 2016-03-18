@@ -8,12 +8,16 @@ import java.net.Socket;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 
+import reactor.core.publisher.SchedulerGroup;
 import br.com.asouza.reactor.actions.Action;
+import br.com.asouza.reactor.actions.IndexedRunnable;
 
 public class ReactorServer {
 
-	private static ExecutorService threadRequestsPool = Executors.newFixedThreadPool(32);
+	private static SchedulerGroup async = SchedulerGroup.async();
+	private static SchedulerGroup io = SchedulerGroup.io();
 
 	@SuppressWarnings("resource")
 	public static void main(String[] args) throws Exception {
@@ -22,11 +26,18 @@ public class ReactorServer {
 			Socket newClient = server.accept();
 			PrintStream response = new PrintStream(newClient.getOutputStream());
 			Action action = discoverAction(newClient);
-
-			threadRequestsPool.execute(() -> {
-				action.execute(response);
+			
+			Runnable runnable = () -> {
+				IndexedRunnable actionRunnable = action.execute(response);
+				actionRunnable.run();
+				System.out.println("Closing resources "+actionRunnable.toString());
 				closeResourcesAfterLogic(newClient, response);
-			});
+			};
+			if (action.hasDatabaseCalls()) {
+				io.accept(runnable);
+			} else {
+				async.accept(runnable);
+			}
 		}
 	}
 
@@ -36,8 +47,8 @@ public class ReactorServer {
 		@SuppressWarnings("resource")
 		Scanner scanner = new Scanner(fromClient);
 
-		Action action = (Action) Class.forName(
-				"br.com.asouza.reactor.actions." + scanner.next()).newInstance();
+		Action action = (Action) Class.forName("br.com.asouza.reactor.actions." + scanner.next())
+				.newInstance();
 		return action;
 	}
 
